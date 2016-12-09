@@ -1,0 +1,13 @@
+serverid=1
+port=8000
+store=data/data1
+ringaddr=localhost:5000
+logDir=log/server1-0
+ringaddr=localhost:5001
+logDir=log/server1-1
+ringaddr=localhost:5002
+logDir=log/server1-2
+ringaddr=localhost:5003
+logDir=log/server1-3
+ringaddr=localhost:5004
+logDir=log/server1-4

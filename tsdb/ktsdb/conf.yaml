@@ -1,0 +1,24 @@
+bench:
+  ktsdHost: "localhost"
+  ktsdPort: 8000
+  metrics: [
+              "metric00",
+              "metric01",
+              "metric02",
+              "metric03",
+              "metric04",
+              "metric05",
+              "metric06",
+              "metric07",
+              "metric08",
+              "metric09",
+           ]
+  tags:
+    host: [ "host00", "host01", "host02", "host03" ]
+    dc: [ "dc00", "dc01", "dc02", "dc03" ]
+  start: 1451606400000 # 2016-01-01T00:00:00
+  end: 1451692800000 # 2016-01-02T00:00:00
+  sampleFrequency: 1
+  httpClient:
+    keepAlive: "10s"
+    timeout: "10s"

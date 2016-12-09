@@ -1,0 +1,30 @@
+start
+create events table
+create states table
+start event source threads
+start query worker
+read 12 for bucket 7 at total 167 5.442827e-02 rate 3.068259e+03 
+read 4 for bucket 7 at total 334 8.116066e-02 rate 4.115294e+03 
+read 7 for bucket 7 at total 334 1.136959e-01 rate 2.937661e+03 
+read 19 for bucket 7 at total 334 1.885628e-01 rate 1.771293e+03 
+read 12 for bucket 7 at total 501 7.477062e-02 rate 6.700493e+03 
+read 18 for bucket 7 at total 1002 1.300006e-01 rate 7.707659e+03 
+read 9 for bucket 7 at total 835 1.186199e-01 rate 7.039291e+03 
+write 1 total 750000 for bucket 7 at count 750000 time 7.475994e+00 rate of 1.003211e+05 
+write 2 total 750000 for bucket 7 at count 750000 time 7.531048e+00 rate of 9.958774e+04 
+write 0 total 750000 for bucket 7 at count 750000 time 7.548486e+00 rate of 9.935768e+04 
+write 1 total 1500000 for bucket 7 at count 750000 time 6.260828e+00 rate of 1.197925e+05 
+write 2 total 1500000 for bucket 7 at count 750000 time 6.258759e+00 rate of 1.198321e+05 
+write 0 total 1500000 for bucket 7 at count 750000 time 6.240606e+00 rate of 1.201806e+05 
+write 1 total 2250000 for bucket 7 at count 750000 time 6.695612e+00 rate of 1.120137e+05 
+write 2 total 2250000 for bucket 7 at count 750000 time 6.686428e+00 rate of 1.121675e+05 
+write 0 total 2250000 for bucket 7 at count 750000 time 6.689079e+00 rate of 1.121231e+05 
+write 1 total 3000000 for bucket 7 at count 750000 time 8.926407e+00 rate of 8.402037e+04 
+write 2 total 3000000 for bucket 7 at count 750000 time 8.932615e+00 rate of 8.396198e+04 
+write 0 total 3000000 for bucket 7 at count 750000 time 8.964131e+00 rate of 8.366678e+04 
+write 2 total 3750000 for bucket 7 at count 750000 time 6.913436e+00 rate of 1.084844e+05 
+write 1 total 3750000 for bucket 7 at count 750000 time 6.963025e+00 rate of 1.077118e+05 
+write 0 total 3750000 for bucket 7 at count 750000 time 6.984561e+00 rate of 1.073797e+05 
+write 1 total 4500000 for bucket 7 at count 750000 time 8.725365e+00 rate of 8.595629e+04 
+write 2 total 4500000 for bucket 7 at count 750000 time 8.782291e+00 rate of 8.539913e+04 
+write 0 total 4500000 for bucket 7 at count 750000 time 8.909629e+00 rate of 8.417859e+04 

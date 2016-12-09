@@ -1,0 +1,7 @@
+port: 9000
+name: "KTSDB Demo"
+kdb: [
+   "http://localhost:8000",
+   "http://localhost:8001",
+   "http://localhost:8002"
+   ]
