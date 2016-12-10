@@ -32,7 +32,7 @@ public class Subscriber {
   private static String evtopts() {
     Options options = new Options();
     options.CompactionStyle = "FIFO";
-    options.MaxTableFilesSizeFIFO = 1024*1024*1024*5L;
+    options.MaxTableFilesSizeFIFO = 1024*1024*1024*10L;
     options.MaxBackgroundFlushes = 2;
     options.MaxBackgroundCompactions = 4;
     options.MaxWriteBufferNumber = 32;
