@@ -33,24 +33,7 @@ final class MessageBuilder {
     return Message.newBuilder().setType(MessageType.Response).setResponse(op).build();
   }
 
-  public static Message buildOpenOp(String table, String options) {
-    OpenOperation op = OpenOperation
-      .newBuilder()
-      .setTable(table)
-      .setOptions(options == null? "" : options)
-      .build();
-    return Message.newBuilder().setType(MessageType.Open).setOpenOp(op).build();
-  }
-
-  public static Message buildOpenOp(String table, List<String> columns, String merge, String options) {
-    return buildOpenOp(table, columns, merge, -1, options);
-  }
-
-  public static Message buildOpenOp(String table, List<String> columns, String merge, int ttl, String options) {
-    return buildOpenOp(table, columns, merge, -1, "", options);
-  }
-
-  public static Message buildOpenOp(String table, List<String> columns, String merge, int ttl, String compression, String options) {
+  public static Message buildOpenOp(String table, List<String> columns, String merge, int ttl, String compression, String options, String backupOptions) {
     OpenOperation op = OpenOperation
       .newBuilder()
       .setTable(table)
@@ -59,6 +42,7 @@ final class MessageBuilder {
       .setMergeOperator(merge == null? "" : merge)
       .addAllColumns(columns == null? emptyList : columns)
       .setOptions(options == null? "" : options)
+      .setBackupOptions(backupOptions == null? "" : backupOptions)
       .build();
     return Message.newBuilder().setType(MessageType.Open).setOpenOp(op).build();
   }

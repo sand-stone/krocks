@@ -113,6 +113,7 @@ message OpenOperation {
   int32 ttl = 4;
   string compression = 5;
   string options = 6;
+  string backupOptions = 7;
 }
 
 message CompactOperation {

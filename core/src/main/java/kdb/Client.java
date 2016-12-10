@@ -27,6 +27,7 @@ public final class Client implements Closeable {
   private String table;
   private String token;
   private String options;
+  private String backupOptions;
 
   public enum Status {
     OK,
@@ -90,7 +91,7 @@ public final class Client implements Closeable {
     timer.start();
   }
 
-  public Client(String uri, String table, String options, int timeout) {
+  public Client(String uri, String table, String options, String backupOptions, int timeout) {
     try {
       final AsyncHttpClientConfig config = new DefaultAsyncHttpClientConfig.Builder().setRequestTimeout(timeout).setNettyTimer(timer).build();
       client = new DefaultAsyncHttpClient(config);
@@ -101,88 +102,80 @@ public final class Client implements Closeable {
     this.table = table;
     this.token = "";
     this.options = options;
+    this.backupOptions = backupOptions;
   }
 
   public Client(String uri, String table, String options) {
-    this(uri, table, options, Integer.MAX_VALUE);
+    this(uri, table, options, null, Integer.MAX_VALUE);
+  }
+
+  public Client(String uri, String table, String options, String backupOptions) {
+    this(uri, table, options, backupOptions, Integer.MAX_VALUE);
   }
 
   public Client(String uri, String table) {
-    this(uri, table, null, Integer.MAX_VALUE);
+    this(uri, table, null, null);
   }
 
   public Result open() {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, options));
-    return new Result(msg.getResponse());
+    return open((String)null);
   }
 
   public Result openCompressed(String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, null, -1, compression, options));
-    return new Result(msg.getResponse());
+    return open(-1, compression);
   }
 
   public Result open(int ttl) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, null, ttl, options));
-    return new Result(msg.getResponse());
+    return open(ttl, null);
   }
 
   public Result open(int ttl, String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, null, ttl, compression, options));
-    return new Result(msg.getResponse());
+    return open((String)null, ttl, compression);
   }
 
   public Result open(String merge) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, merge, options));
-    return new Result(msg.getResponse());
+    return open(merge, -1);
   }
 
   public Result open(String merge, int ttl) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, merge, ttl, options));
-    return new Result(msg.getResponse());
+    return open(merge, ttl, null);
   }
 
   public Result open(String merge, int ttl, String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, merge, ttl, compression, options));
+    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, null, merge, ttl, compression, options, backupOptions));
     return new Result(msg.getResponse());
   }
 
   public Result open(List<String> columns) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, null, options));
-    return new Result(msg.getResponse());
+    return open(columns, null);
   }
 
   public Result openCompressed(List<String> columns, String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, null, -1, compression, options));
-    return new Result(msg.getResponse());
+    return open(columns, null, -1, compression);
   }
 
   public Result open(List<String> columns, int ttl) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, null, ttl, options));
-    return new Result(msg.getResponse());
+    return open(columns, ttl, null);
   }
 
   public Result open(List<String> columns, int ttl, String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, null, ttl, compression, options));
-    return new Result(msg.getResponse());
+    return open(columns, null, ttl, compression);
   }
 
   public Result open(List<String> columns, String merge) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, merge, options));
-    return new Result(msg.getResponse());
+    return open(columns, merge, null);
   }
 
   public Result open(List<String> columns, String merge, String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, merge, -1, compression, options));
-    return new Result(msg.getResponse());
+    return open(columns, merge, -1, compression);
   }
 
   public Result open(List<String> columns, String merge, int ttl) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, merge, ttl, options));
-    return new Result(msg.getResponse());
+    return open(columns, merge, ttl, null);
   }
 
   public Result open(List<String> columns, String merge, int ttl, String compression) {
-    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, merge, ttl, compression, options));
+    Message msg = sendMsg(MessageBuilder.buildOpenOp(table, columns, merge, ttl, compression, options, backupOptions));
     return new Result(msg.getResponse());
   }
 
