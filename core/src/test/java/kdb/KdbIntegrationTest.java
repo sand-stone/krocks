@@ -22,6 +22,27 @@ import com.google.gson.Gson;
 public class KdbIntegrationTest extends TestCase {
   private static Logger log = LogManager.getLogger(KdbIntegrationTest.class);
 
+  public static class Options {
+    String CompactionStyle;
+    long MaxTableFilesSizeFIFO;
+    int MaxBackgroundFlushes;
+    int MaxBackgroundCompactions;
+    int MaxWriteBufferNumber;
+    int MinWriteBufferNumberToMerge;
+    int WalTtlSeconds;
+  }
+
+  public static class BackupOptions {
+    String Path;
+    boolean ShareTableFiles;
+    boolean Sync;
+    boolean DestroyOldData;
+    boolean BackupLogFiles;
+    long BackupRateLimit;
+    long RestoreRateLimit;
+    boolean ShareFilesWithChecksum;
+  }
+
   public KdbIntegrationTest(String testName) {
     super(testName);
   }
@@ -346,16 +367,6 @@ public class KdbIntegrationTest extends TestCase {
     }
   }
 
-  public static class Options {
-    String CompactionStyle;
-    long MaxTableFilesSizeFIFO;
-    int MaxBackgroundFlushes;
-    int MaxBackgroundCompactions;
-    int MaxWriteBufferNumber;
-    int MinWriteBufferNumberToMerge;
-    int WalTtlSeconds;
-  }
-
   public void test11() {
     String table = "test11";
     Options options = new Options();
@@ -610,5 +621,37 @@ public class KdbIntegrationTest extends TestCase {
     }
   }
 
+  public void test19() {
+    String table = "test19";
+    Options options = new Options();
+    options.CompactionStyle = "FIFO";
+    options.MaxTableFilesSizeFIFO = 1024*1024*1024*5L;
+    options.MaxBackgroundFlushes = 2;
+    options.MaxBackgroundCompactions = 4;
+    options.MaxWriteBufferNumber = 8;
+    options.MinWriteBufferNumberToMerge = 4;
+    options.WalTtlSeconds = 1000;
+    Gson gson = new Gson();
 
+    BackupOptions backupOpts = new BackupOptions();
+    backupOpts.Path = "./backup";
+
+    /*try(Client client = new Client("http://localhost:8000/",
+                                   table,
+                                   gson.toJson(options),
+                                   gson.toJson(backupOpts)
+                                   )) {
+      Client.Result rsp = client.open("append");
+      List<byte[]> keys = new ArrayList<byte[]>();
+      List<byte[]> values = new ArrayList<byte[]>();
+      int count = 10;
+      for(int i = 0; i < count; i++) {
+        keys.add(("keys"+i).getBytes());
+        values.add(("values"+i).getBytes());
+      }
+      rsp = client.put(keys, values);
+      rsp = client.put(keys, values);
+      rsp = client.get(keys);
+      } */
+  }
 }

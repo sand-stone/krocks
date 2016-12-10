@@ -125,9 +125,56 @@ class Store implements Closeable {
     };
   }
 
-  private RocksDB getDB(Options options, String path, int ttl) throws RocksDBException {
+  private static class KdbBackupOptions extends HashMap<String, Object> {};
+
+  private BackupableDBOptions parseBackupOptions(String json) {
+    KdbBackupOptions opts = gson.fromJson(json, KdbBackupOptions.class);
+    BackupableDBOptions backupOptions;
+    if(opts != null) {
+      String path = (String)opts.get("Path");
+      Random rnd = new Random();
+      log.info("back path {}", path);
+      Utils.mkdir(path);
+      backupOptions = new BackupableDBOptions(path);
+      opts.forEach((name, v)->{
+          switch(name) {
+          case "ShareTableFiles":
+            backupOptions.setShareTableFiles((boolean)v);
+            break;
+          case "Sync":
+            backupOptions.setSync((boolean)v);
+            break;
+          case "DestroyOldData":
+            backupOptions.setDestroyOldData((boolean)v);
+            break;
+          case "BackupLogFiles":
+            backupOptions.setBackupLogFiles((boolean)v);
+            break;
+          case "BackupRateLimit":
+            backupOptions.setBackupRateLimit((long)((double)v));
+            break;
+          case "RestoreRateLimit":
+            backupOptions.setRestoreRateLimit((long)((double)v));
+            break;
+          case "ShareFilesWithChecksum":
+            backupOptions.setShareFilesWithChecksum((boolean)v);
+            break;
+          }
+        });
+    } else {
+      backupOptions = new BackupableDBOptions("default-backup");
+    }
+    return backupOptions;
+  }
+
+  private RocksDB getDB(Options options, String backupOptions, String path, int ttl) throws RocksDBException {
+    //log.info("options {}", backupOptions);
     if(ttl == -1) {
-      return RocksDB.open(options, path);
+      if(backupOptions.length() == 0)
+        return RocksDB.open(options, path);
+      else {
+        return BackupableDB.open(options, parseBackupOptions(backupOptions), path);
+      }
     }
     //log.info("create {} ttl {}", path, ttl);
     return TtlDB.open(options, path, ttl, false);
@@ -407,9 +454,9 @@ class Store implements Closeable {
           List<String> columns = op.getColumnsList();
           if(columns.size() == 0) {
             setMergeOperator(options, dt.merge);
-            db = getDB(options, path, ttl);
+            db = getDB(options, op.getBackupOptions(), path, ttl);
           } else {
-            try(final RocksDB db2 = getDB(options, path, ttl)) {
+            try(final RocksDB db2 = getDB(options, op.getBackupOptions(), path, ttl)) {
               assert(db2 != null);
               columns.stream().forEach(col -> {
                   try(ColumnFamilyOptions colOpts = new ColumnFamilyOptions()) {
