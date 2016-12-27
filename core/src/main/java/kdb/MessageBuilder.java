@@ -186,9 +186,15 @@ final class MessageBuilder {
   }
 
   public static Message buildSeqOp(String table) {
+    return buildSeqOp(table, "", 0);
+  }
+
+  public static Message buildSeqOp(String table, String endpoint, long seqno) {
     SequenceOperation op = SequenceOperation
       .newBuilder()
       .setTable(table)
+      .setEndpoint(endpoint)
+      .setSeqno(seqno)
       .build();
     return Message.newBuilder().setType(MessageType.Sequence).setSeqOp(op).build();
   }

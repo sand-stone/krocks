@@ -87,7 +87,7 @@ final class DataNode {
       r = store.scanlog(msg.getScanlogOp());
       break;
     case Put:
-      table = msg.getGetOp().getTable();
+      table = msg.getPutOp().getTable();
       if(standalone) {
         r = store.update(msg.getPutOp());
       } else {

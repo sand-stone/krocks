@@ -45,8 +45,14 @@ import java.util.ArrayList;
 
 public class NettyTransport {
   private static Logger log = LogManager.getLogger(NettyTransport.class);
+  private static NettyTransport instance = new NettyTransport();
+  private String dataaddr;
 
-  public NettyTransport() { }
+  private NettyTransport() { }
+
+  public static NettyTransport get() {
+    return instance;
+  }
 
   static List<Ring> configRings(PropertiesConfiguration config, boolean standalone) {
     List<Ring> rings = new ArrayList<Ring>();
@@ -70,8 +76,31 @@ public class NettyTransport {
     return rings;
   }
 
+  private static class HostPort {
+    public String host;
+    public int port;
+
+    public static HostPort parse(String dataaddr) {
+      String[] parts= dataaddr.split(":");
+      HostPort hostport = new HostPort();
+      hostport.host = "localhost";
+      hostport.port = 8000;
+      if(parts.length != 2) {
+        log.info("dataaddr error");
+      }
+      hostport.host = parts[0];
+      try {
+        hostport.port = Integer.parseInt(parts[1]);
+      } catch(NumberFormatException e) {
+        log.info("dataaddr error");
+      }
+      return hostport;
+    }
+  }
+
   public void start(PropertiesConfiguration config) {
-    int port = config.getInt("port");
+    dataaddr = config.getString("dataaddr");
+    HostPort hostport = HostPort.parse(dataaddr);
     boolean SSL = config.getBoolean("ssl", false);
     final SslContext sslCtx;
     if (SSL) {
@@ -100,7 +129,7 @@ public class NettyTransport {
         //.handler(new LoggingHandler(LogLevel.INFO))
         .childHandler(new HttpKdbServerInitializer(sslCtx, datanode));
 
-      Channel ch = b.bind(port).sync().channel();
+      Channel ch = b.bind(hostport.port).sync().channel();
       ch.closeFuture().sync();
     } catch(Exception e) {
       throw new KdbException(e);
@@ -234,6 +263,6 @@ public class NettyTransport {
     Configurations configs = new Configurations();
     PropertiesConfiguration config = configs.properties(propertiesFile);
 
-    new NettyTransport().start(config);
+    NettyTransport.get().start(config);
   }
 }

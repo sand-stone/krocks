@@ -1,5 +1,5 @@
 serverid=3
-port=8002
+dataaddr=localhost:8002
 store=data/data3
 ringaddr=localhost:7000
 leader=localhost:6000

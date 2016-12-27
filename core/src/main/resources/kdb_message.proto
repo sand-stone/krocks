@@ -37,6 +37,8 @@ message Message {
 
 message SequenceOperation {
   string table = 1;
+  string endpoint = 2;
+  int64 seqno = 3;
 }
 
 message ScanlogOperation {
