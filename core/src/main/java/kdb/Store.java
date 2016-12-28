@@ -703,7 +703,7 @@ class Store implements Closeable {
     } finally {
       table.dec();
     }
-    return MessageBuilder.buildResponse("updated " + table);
+    return MessageBuilder.buildSeq(table.db.getLatestSequenceNumber());
   }
 
   private ReadOptions getReadOptions() {
@@ -1029,7 +1029,7 @@ class Store implements Closeable {
     int limit = op.getLimit();
     try(TransactionLogIterator iter = dt.db.getUpdatesSince(op.getSeqno())) {
       dt.inc();
-      //log.info("last seq {}", op.getSeqno());
+      //log.info("last seq {} ", op);
       List<byte[]> keys = new ArrayList<byte[]>();
       List<byte[]> values = new ArrayList<byte[]>();
       List<Byte> ops = new ArrayList<Byte>();
@@ -1052,17 +1052,32 @@ class Store implements Closeable {
       }
       ret = MessageBuilder.buildLog(seqno, logops, keys, values);
     } catch (RocksDBException e) {
-      log.info("scan log {}", e);
+      log.info("scan log {} => {}", op, e.getMessage());
     } finally {
       dt.dec();
     }
     return ret;
   }
 
-  public Message handle(ByteBuffer data) throws IOException {
-    byte[] arr = new byte[data.remaining()];
-    data.get(arr);
-    Message msg = Message.parseFrom(arr);
+  public Message fetch(SequenceOperation op) {
+    Message ret = MessageBuilder.emptyMsg;
+    if(!op.getEndpoint().equals(NettyTransport.get().dataaddr)) {
+      try (Client client = new Client("http://"+op.getEndpoint(), op.getTable())) {
+        client.open();
+        Client.Result rsp = client.scanlog(op.getSeqno(), 1);
+        //log.info("fetch wal rsp count {}", rsp.count());
+        Store.get().update(op.getTable(), rsp);
+        //DataTable dt = tables.get(op.getTable());
+        //log.info("*** {} {} == {}", op, dt.db.getLatestSequenceNumber(), op.getSeqno());
+      } catch(Exception e) {
+        log.info("xxxxxx {}", op);
+        log.info(e);
+      }
+    }
+    return  ret;
+  }
+
+  public Message handle(Message msg) throws IOException {
     //log.info("handle {}", msg);
     if(msg.getType() == MessageType.Put) {
       PutOperation op = msg.getPutOp();
@@ -1074,6 +1089,10 @@ class Store implements Closeable {
       msg = drop(msg.getDropOp());
     } else if(msg.getType() == MessageType.Compact) {
       msg = compact(msg.getCompactOp());
+    } else  if(msg.getType() == MessageType.Sequence) {
+      msg = fetch(msg.getSeqOp());
+    } else {
+      msg = MessageBuilder.buildResponse("unknown message type");
     }
     return msg;
   }

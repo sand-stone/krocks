@@ -46,7 +46,7 @@ import java.util.ArrayList;
 public class NettyTransport {
   private static Logger log = LogManager.getLogger(NettyTransport.class);
   private static NettyTransport instance = new NettyTransport();
-  private String dataaddr;
+  String dataaddr;
 
   private NettyTransport() { }
 

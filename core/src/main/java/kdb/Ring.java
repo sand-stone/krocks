@@ -18,6 +18,7 @@ import kdb.rsm.ZabConfig;
 import kdb.rsm.ZabException;
 import kdb.rsm.Zxid;
 import kdb.proto.Database.Message;
+import kdb.proto.Database.Message.MessageType;
 
 class Ring implements Runnable, StateMachine {
   private static Logger log = LogManager.getLogger(Ring.class);
@@ -70,12 +71,20 @@ class Ring implements Runnable, StateMachine {
                       Object ctx) {
     //log.info("deliver {}, {}", stateUpdate, ctx);
     Message msg = MessageBuilder.nullMsg;
+    Message ret = MessageBuilder.nullMsg;
     try {
-      msg = store.handle(stateUpdate);
+      byte[] arr = new byte[stateUpdate.remaining()];
+      stateUpdate.get(arr);
+      msg = Message.parseFrom(arr);
+      ret = store.handle(msg);
     } catch(IOException e) {
       log.info("deliver callback handle {}", e);
     } finally {
-      NettyTransport.HttpKdbServerHandler.reply(ctx, msg);
+      if(msg.getType() != MessageType.Sequence) {
+        NettyTransport.HttpKdbServerHandler.reply(ctx, ret);
+      } else {
+        //log.info("msg {} => r {}", msg, ret);
+      }
     }
   }
 

@@ -88,10 +88,12 @@ final class DataNode {
       break;
     case Put:
       table = msg.getPutOp().getTable();
-      if(standalone) {
-        r = store.update(msg.getPutOp());
-      } else {
-        rsend(msg, context);
+      r = store.update(msg.getPutOp());
+      if(!standalone) {
+        Message repl = MessageBuilder.buildSeqOp(table,
+                                                 NettyTransport.get().dataaddr,
+                                                 r.getResponse().getSeqno());
+        rsend(repl, context);
       }
       break;
     case Subscribe:
