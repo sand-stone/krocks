@@ -1040,10 +1040,12 @@ class Store implements Closeable {
         TransactionLogIterator.BatchResult batch = iter.getBatch();
         seqno = batch.sequenceNumber();
         try(WriteBatch wb = batch.writeBatch()) {
+          seqno += wb.count() - 1;
           process(wb, ops, keys, values);
         }
-        if(++count >= limit)
+        if(++count >= limit) {
           break;
+        }
         iter.next();
       }
       byte[] logops = new byte[ops.size()];
@@ -1064,13 +1066,17 @@ class Store implements Closeable {
     if(!op.getEndpoint().equals(NettyTransport.get().dataaddr)) {
       try (Client client = new Client("http://"+op.getEndpoint(), op.getTable())) {
         client.open();
-        Client.Result rsp = client.scanlog(op.getSeqno(), 1);
-        //log.info("fetch wal rsp count {}", rsp.count());
-        Store.get().update(op.getTable(), rsp);
-        //DataTable dt = tables.get(op.getTable());
-        //log.info("*** {} {} == {}", op, dt.db.getLatestSequenceNumber(), op.getSeqno());
+        long seqno = op.getSeqno();
+        DataTable dt = tables.get(op.getTable());
+        if(seqno > dt.db.getLatestSequenceNumber()) {
+          do {
+            Client.Result rsp = client.scanlog(op.getSeqno(), 1);
+            //log.info("fetch wal rsp count {}", rsp.count());
+            Store.get().update(op.getTable(), rsp);
+            seqno = rsp.seqno();
+          } while(op.getSeqno() > seqno);
+        }
       } catch(Exception e) {
-        log.info("xxxxxx {}", op);
         log.info(e);
       }
     }
