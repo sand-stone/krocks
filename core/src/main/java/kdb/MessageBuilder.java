@@ -82,17 +82,6 @@ final class MessageBuilder {
     return Message.newBuilder().setType(MessageType.Scan).setScanOp(scan).build();
   }
 
-  public static Message buildSubcribeOp(String table, String uri, String source, long seqno) {
-    SubscribeOperation subscribe = SubscribeOperation
-      .newBuilder()
-      .setTable(table)
-      .setUri(uri)
-      .setSource(source)
-      .setSeqno(seqno)
-      .build();
-    return Message.newBuilder().setType(MessageType.Subscribe).setSubscribeOp(subscribe).build();
-  }
-
   public static Message buildResponse(String token, List<byte[]> keys, List<byte[]> values) {
     Response op = Response
       .newBuilder()

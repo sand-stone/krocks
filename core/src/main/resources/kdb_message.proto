@@ -17,8 +17,7 @@ message Message {
     Compact = 6;
     Sequence = 7;
     Scanlog = 8;
-    Subscribe = 9;
-    Response = 10;
+    Response = 9;
   }
 
   MessageType type = 1;
@@ -31,8 +30,7 @@ message Message {
   CompactOperation compactOp = 8;
   SequenceOperation seqOp = 9;
   ScanlogOperation scanlogOp = 10;
-  SubscribeOperation subscribeOp = 11;
-  Response response = 12;
+  Response response = 11;
 }
 
 message SequenceOperation {
@@ -45,13 +43,6 @@ message ScanlogOperation {
   string table = 1;
   int64 seqno = 2;
   int32 limit = 3;
-}
-
-message SubscribeOperation {
-  string table = 1;
-  string uri = 2;
-  string source = 3;
-  int64 seqno = 4;
 }
 
 message Response {

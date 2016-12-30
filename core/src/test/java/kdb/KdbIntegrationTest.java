@@ -439,46 +439,7 @@ public class KdbIntegrationTest extends TestCase {
   }
 
   public void test14() {
-    String source = "test14-source";
-    String target = "test14-target";
-    int count = 3;
-
-    try(Client client = new Client("http://localhost:8000/", source)) {
-      Client.Result rsp = client.openCompressed("snappy");
-      List<byte[]> keys = new ArrayList<byte[]>();
-      List<byte[]> values = new ArrayList<byte[]>();
-      for(int i = 0; i < count; i++) {
-        keys.add(("keys"+i).getBytes());
-        values.add(("values"+i).getBytes());
-      }
-      rsp = client.put(keys, values);
-      keys.clear(); values.clear();
-      for(int i = 0; i < count; i++) {
-        keys.add(("2keys"+i).getBytes());
-        values.add(("2values"+i).getBytes());
-      }
-      rsp = client.put(keys, values);
-    }
-
-    try(Client client = new Client("http://localhost:8000/", target)) {
-      Client.Result rsp = client.openCompressed("snappy");
-      client.subscribe("http://localhost:8000/", source, 0);
-      //log.info("target lsn {}", client.getLatestSequenceNumber());
-      try {Thread.currentThread().sleep(2000);} catch(Exception ex) {}
-      //log.info("target lsn {}", client.getLatestSequenceNumber());
-      rsp = client.scanFirst(1000);
-      log.info("count {} rsp.count {}", count, rsp.count());
-      if(rsp.count() == count*2)
-        assertTrue(true);
-      else
-        assertTrue(false);
-      client.unsubscribe("http://localhost:8000/", source);
-      //log.info("rsp {}", rsp.count());
-    }
-  }
-
-  public void test15() {
-    String table = "test15";
+    String table = "test14";
     try(Client client = new Client("http://localhost:8000/", table)) {
       List<String> cols = Arrays.asList("test15col1", "test15col2");
       Client.Result rsp = client.open(cols, "append");
@@ -512,7 +473,7 @@ public class KdbIntegrationTest extends TestCase {
     }
   }
 
-  public void test16() {
+  public void test15() {
     int count = 10;
     List<byte[]> keys = new ArrayList<byte[]>();
     List<byte[]> values = new ArrayList<byte[]>();
@@ -520,7 +481,7 @@ public class KdbIntegrationTest extends TestCase {
       keys.add(("test16key"+i).getBytes());
       values.add(("test16value"+i).getBytes());
     }
-    String table = "test16";
+    String table = "test15";
     try (Client client = new Client("http://localhost:8000/", table)) {
       client.open();
       client.put(keys, values);
@@ -545,85 +506,8 @@ public class KdbIntegrationTest extends TestCase {
     }
   }
 
-  public void test17() {
-    String source = "test17-source";
-    String target = "test17-target";
-    int count = 3;
-    List<String> cfs = new ArrayList<String>();
-    cfs.add("cf1");
-    try(Client client = new Client("http://localhost:8000/", source)) {
-      Client.Result rsp = client.open(cfs);
-      List<byte[]> keys = new ArrayList<byte[]>();
-      List<byte[]> values = new ArrayList<byte[]>();
-      for(int i = 0; i < count; i++) {
-        keys.add(("keys"+i).getBytes());
-        values.add(("values"+i).getBytes());
-      }
-      rsp = client.put("cf1", keys, values);
-      keys.clear(); values.clear();
-      for(int i = 0; i < count; i++) {
-        keys.add(("2keys"+i).getBytes());
-        values.add(("2values"+i).getBytes());
-      }
-      rsp = client.put("cf1", keys, values);
-    }
-
-    try(Client client = new Client("http://localhost:9000/", target)) {
-      Client.Result rsp = client.open(cfs);
-      client.subscribe("http://localhost:8000/", source, 0);
-      //log.info("target lsn {}", client.getLatestSequenceNumber());
-      try {Thread.currentThread().sleep(1000);} catch(Exception ex) {}
-      //log.info("target lsn {}", client.getLatestSequenceNumber());
-      rsp = client.scanFirst(1000);
-      //log.info("rsp {}", rsp.count());
-      /*if(rsp.count() == count*2)
-        assertTrue(true);
-        else
-        assertTrue(false);*/
-      //client.unsubscribe("http://localhost:8000/", source);
-      //log.info("rsp {}", rsp.count());
-    }
-  }
-
-  public void test18() {
-    String source = "test18-source";
-    String target = "test18-target";
-    int count = 3;
-    List<byte[]> keys = new ArrayList<byte[]>();
-    List<byte[]> values = new ArrayList<byte[]>();
-    try(Client client = new Client("http://localhost:8000/", source)) {
-      Client.Result rsp = client.open("append");
-      for(int i = 0; i < count; i++) {
-        keys.add(("test18keys"+i).getBytes());
-        values.add(("test18values"+i).getBytes());
-      }
-      rsp = client.put(keys, values);
-      rsp = client.put(keys, values);
-    }
-
-    try(Client client = new Client("http://localhost:9000/", target)) {
-      Client.Result rsp = client.open("append");
-      client.subscribe("http://localhost:8000/", source, 0);
-      //log.info("target lsn {}", client.getLatestSequenceNumber());
-      try {Thread.currentThread().sleep(1000);} catch(Exception ex) {}
-      //log.info("target lsn {}", client.getLatestSequenceNumber());
-      rsp = client.scanFirst(1000);
-      //log.info("test18 rsp {}", rsp);
-      if(rsp.count() == count) {
-        assertTrue(true);
-        if(rsp.getValue(0).length == (2*values.get(0).length+1))
-          assertTrue(true);
-        else
-          assertTrue(false);
-      } else
-        assertTrue(false);
-      client.unsubscribe("http://localhost:8000/", source);
-      //log.info("rsp {}", rsp.count());
-    }
-  }
-
-  public void test19() {
-    String table = "test19";
+  public void test16() {
+    String table = "test16";
     Options options = new Options();
     options.CompactionStyle = "FIFO";
     options.MaxTableFilesSizeFIFO = 1024*1024*1024*5L;

@@ -189,16 +189,6 @@ public final class Client implements Closeable {
     return new Result(msg.getResponse());
   }
 
-  public String subscribe(String uri, String table, long seqno) {
-    Message msg = sendMsg(MessageBuilder.buildSubcribeOp(this.table, uri, table, seqno));
-    return msg.getResponse().getReason();
-  }
-
-  public String unsubscribe(String uri, String table) {
-    Message msg = sendMsg(MessageBuilder.buildSubcribeOp(this.table, uri, table, -1));
-    return msg.getResponse().getReason();
-  }
-
   public Result compact() {
     return compact(null, null, null);
   }

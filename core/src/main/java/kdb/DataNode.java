@@ -96,9 +96,6 @@ final class DataNode {
         rsend(repl, context);
       }
       break;
-    case Subscribe:
-      r = KPoll.get().process(msg.getSubscribeOp());
-      break;
     default:
       r = MessageBuilder.emptyMsg;
       break;
