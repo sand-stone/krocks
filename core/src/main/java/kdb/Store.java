@@ -1068,16 +1068,19 @@ class Store implements Closeable {
         client.open();
         long seqno = op.getSeqno();
         DataTable dt = tables.get(op.getTable());
-        if(seqno > dt.db.getLatestSequenceNumber()) {
+        long lsn = dt.db.getLatestSequenceNumber();
+        lsn++;
+        if(seqno >= lsn) {
           do {
-            Client.Result rsp = client.scanlog(op.getSeqno(), 1);
+            Client.Result rsp = client.scanlog(lsn, 1);
             //log.info("fetch wal rsp count {}", rsp.count());
             Store.get().update(op.getTable(), rsp);
-            seqno = rsp.seqno();
-          } while(op.getSeqno() > seqno);
+            lsn = rsp.seqno();
+          } while(lsn < seqno);
+          //log.info("table {} seqno {} lsn {}", op.getTable(), seqno, lsn);
         }
       } catch(Exception e) {
-        log.info(e);
+        log.info("failed to reach master {} exception: {}", op.getEndpoint(), e);
       }
     }
     return  ret;

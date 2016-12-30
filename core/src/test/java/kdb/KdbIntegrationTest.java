@@ -464,9 +464,10 @@ public class KdbIntegrationTest extends TestCase {
       Client.Result rsp = client.openCompressed("snappy");
       client.subscribe("http://localhost:8000/", source, 0);
       //log.info("target lsn {}", client.getLatestSequenceNumber());
-      try {Thread.currentThread().sleep(1000);} catch(Exception ex) {}
+      try {Thread.currentThread().sleep(2000);} catch(Exception ex) {}
       //log.info("target lsn {}", client.getLatestSequenceNumber());
       rsp = client.scanFirst(1000);
+      log.info("count {} rsp.count {}", count, rsp.count());
       if(rsp.count() == count*2)
         assertTrue(true);
       else
